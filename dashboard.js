@@ -138,7 +138,7 @@ dashboard.onclickBookmark=function(that){
   bookmarkedDivs.appendChild(div)
   var fa = $('.fa',div)[0]
   fa.onclick=function(){dashboard.onclickUnBookmark(this)}
-  fa.style.color='red'
+  fa.style.color='pink'
   setTimeout(function(){
     fa.className="fa fa-bookmark"
   },200)
