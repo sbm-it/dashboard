@@ -34,7 +34,7 @@ dashboard=function(){ // ini
 
 //data wrangling
 dashboard.tsv2json=function(x){
-  var rows = decodeURIComponent(x).split('\n').map(function(x){return x.split('\t')})
+  var rows = decodeURIComponent(x).split(/[\n\r]+/).map(function(x){return x.split('\t')})
   y={}
   var parms = rows[0]
   rows.slice(1).forEach(function(r,i){
@@ -48,6 +48,7 @@ dashboard.tsv2json=function(x){
     if(!y[yi.Entity]){y[yi.Entity]={}}
     if(!y[yi.Entity][yi.Attribute]){y[yi.Entity][yi.Attribute]=[]}
     y[yi.Entity][yi.Attribute].push(yi.Value)
+    //y[yi.Entity][yi.Attribute]=yi.Value
   })
   return y
 }
@@ -58,31 +59,137 @@ dashboard.jobs={}
 dashboard.loadDt=function(cb,url){
   var uid = 'UID'+Math.random().toString().slice(2)
   dashboard.jobs[uid]=cb
-  url=url||'https://script.google.com/macros/s/AKfycbz5NlgOdwfm_Llc6qOXrU5DY0dqddUlqBbJNqJpzBAOpFxxjpE/exec'
+  url=url||'https://script.google.com/a/macros/mathbiol.org/s/AKfycbzobhIrPHsDnBj30GLXjd7PPbgFP74feT751pteTvt45RHY7PQ/exec'
   $.getScript(url+'?callback=dashboard.jobs.'+uid)
 }
 
 // assemble UID
 dashboard.UI=function(){
-  h='<h4 id="TableauDashboardHeader" style="color:maroon">Tableau Dashboard for <span style="color:navy">'+dashboard.user+'</span> <a href="https://github.com/sbm-it/tableau" target="_blank"><i id="gitIcon" class="fa fa-github-alt" aria-hidden="true" style="color:maroon"></i></a></h4>'
+  h='<h5 id="TableauDashboardHeader" style="color:maroon">SBM Dashboard for <span style="color:navy">'+dashboard.user+'</span> <a href="https://github.com/sbm-it/dashboard" target="_blank"><i id="gitIcon" class="fa fa-github-alt" aria-hidden="true" style="color:maroon"></i></a></h5>'
   localStorage.removeItem('tableauDashboard') // TO FORCE LOGIN EVERYTIME
-  h+="<hr>"
-  h+='Key words: <span id="keywords"></span>'
   h+="<hr>"
   h+='<div id="bodyDiv">...</div>'
   appSpace.innerHTML=h
   dashboard.bodyDiv()
 }
+dashboard.getDashboardsForUser=function(email){
+  email = email || dashboard.user
+  var dd = dashboard.dt[dashboard.user].dashboard // array of dashboards assigned to that user
+  var y = {}
+  // this could be a good place to add other criteria, such as dashboards associated with 
+  dd.forEach(function(d){
+    var x = dashboard.dt[d]
+    if(!y[d]){y[d]={};y[d].more={}} // register object only if it didn't exist already - so new attributes can also be appended 
+    y[d].more.directUrl=true
+    for(var i in x){
+      y[d][i]=x[i]
+    }
+  })
+  return y
+}
 dashboard.bodyDiv=function(){
-  var tbls = dashboard.dt[dashboard.user].tableau
-  h='<h5 style="color:green">The following '+tbls.length+' Tableau Dashboards were assigned to you:</h5>'
-  h+='<div id="assignedToYou"></div>'
+  if(!localStorage.dashboardBookmarks){localStorage.setItem('dashboardBookmarks','[]')}
+  dashboard.bookmarks=JSON.parse(localStorage.dashboardBookmarks)
+  var dd = dashboard.getDashboardsForUser() // object with dashboards assigned to this user
+  dashboard.bookmarks.forEach(function(d){
+    if(dd[d]){
+      dd[d].bookmarked=true
+    }
+  })
+  //var urls = dashboard.dt[dashboard.user].url
+  var n = Object.getOwnPropertyNames(dd).length
+  h='<div id="keywordSelect">Keywords </div>'
+  h+='<hr>'
+  h+='<h4 style="color:maroon"><i class="fa fa-arrow-right" aria-hidden="true"></i> Dashboards selected for preloading ( <i class="fa fa-bookmark-o" aria-hidden="true"></i> ):</h4>'
+  h+='<div id="bookmarkedDivs"></div>'
+  h+='<hr>'
+  h+='<h4 style="color:maroon"><i class="fa fa-arrow-right" aria-hidden="true"></i> Additional dashboards assigned to you:</h4>'
+  h+='<div id="otherDivs"></div>'
+  h+='<hr>'
   bodyDiv.innerHTML=h
   dashboard.keywords={}
-  tbls.forEach(function(tbl,i){
+  Object.getOwnPropertyNames(dd).forEach(function(di,i){
+    var d = dd[di]
+    var k = d.keywords || [''] // d.keywords
+    d.keywords = k.join(' ').split(/[\s]+/g)
+    d.keywords.forEach(function(ki){
+      dashboard.keywords[ki] = dashboard.keywords[ki] || []
+      dashboard.keywords[ki].push(di)
+    })
+  })
+  dashboard.dbs=dd
+  dashboard.buildDivs()
+  dashboard.buildKeywordSelect()
+}
+
+dashboard.buildKeywordSelect=function(){
+  dashboard.keywords
+  4
+}
+
+dashboard.onclickBookmark=function(that){
+  var div = that.parentElement.parentElement
+  div.dt.bookmarked=true
+  // add it to localStorage
+  var bkm = JSON.parse(localStorage.dashboardBookmarks)
+  bkm.push(div.id)
+  localStorage.setItem('dashboardBookmarks',JSON.stringify(bkm))
+  // move it to bookmarked dashboards
+  bookmarkedDivs.appendChild(div)
+  var fa = $('.fa',div)[0]
+  fa.onclick=function(){dashboard.onclickUnBookmark(this)}
+  fa.style.color='red'
+  setTimeout(function(){
+    fa.className="fa fa-bookmark"
+  },200)
+}
+dashboard.onclickUnBookmark=function(that){
+  var div = that.parentElement.parentElement
+  div.dt.bookmarked=false
+  // add it to localStorage
+  var bkm = JSON.parse(localStorage.dashboardBookmarks)
+  bkm.pop(bkm.indexOf(div.id))
+  localStorage.setItem('dashboardBookmarks',JSON.stringify(bkm))
+  // move it to bookmarked dashboards
+  otherDivs.appendChild(div)
+  var fa = $('.fa',div)[0]
+  fa.onclick=function(){dashboard.onclickBookmark(this)}
+  fa.style.color='blue'
+  setTimeout(function(){
+    fa.className="fa fa-bookmark-o"
+  },300)
+}
+
+dashboard.onmouseoverBookmark=function(that){
+  that.style.cursor="pointer"
+  4
+}
+
+dashboard.buildDivs=function(){ // create dashboard Divs and spread them between bookmarkedDivs and otherDivs
+  Object.getOwnPropertyNames(dashboard.dbs).forEach(function(di){
+    var d = dashboard.dbs[di]
+    d.div = document.createElement('div')
+    d.div.id=di
+    if(d.bookmarked){
+      var h = '<h4><i style="color:red" class="fa fa-bookmark" aria-hidden="true" onclick="dashboard.onclickUnBookmark(this)" onmouseover="dashboard.onmouseoverBookmark(this)"></i> <a href="'+d.url.slice(-1)[0]+'" target="_blank">'+d.title.slice(-1)[0]+'</a> <span style="color:green;font-size:x-small">['+di+']<span></h4>'
+      h += '<span style="color:navy">'+d.description.slice(-1)[0]+'</span> '
+      bookmarkedDivs.appendChild(d.div)
+    }else{
+      var h = '<h4><i style="color:blue" class="fa fa-bookmark-o" aria-hidden="true" onclick="dashboard.onclickBookmark(this)" onmouseover="dashboard.onmouseoverBookmark(this)"></i> <a href="'+d.url.slice(-1)[0]+'" target="_blank">'+d.title.slice(-1)[0]+'</a> <span style="color:green;font-size:x-small">['+di+']<span></h4>'
+      h += '<span style="color:navy">'+d.description.slice(-1)[0]+'</span> '
+      otherDivs.appendChild(d.div)
+    }
+    d.div.innerHTML=h
+    d.div.dt=d
+
+    4
+  })
+  4
+}
+  /*
     var p = document.createElement('p')
-    var url='https://discovery.analytics.healtheintent.com/t/SBMCIN/views/'+tbl+'?:embed=y&:showShareOptions=true&:display_count=no'
-    p.innerHTML=i+'. <a href="'+url+'" target="_blank">'+tbl+'</a> [<span id="show_'+i+'" style="color:green" onclick="dashboard.show(this)">show</span>]'
+    var url='https://discovery.analytics.healtheintent.com/t/SBMCIN/views/'+d+'?:embed=y&:showShareOptions=true&:display_count=no'
+    p.innerHTML=i+'. <a href="'+url+'" target="_blank">'+d+'</a> [<span id="show_'+i+'" style="color:green" onclick="dashboard.show(this)">show</span>]'
     bodyDiv.appendChild(p)
     p.style.cursor="pointer"
     var div = document.createElement('div')
@@ -92,14 +199,10 @@ dashboard.bodyDiv=function(){
     p.appendChild(div)
     div.hidden=true
   })
-  /*
-  h='<hr>'
-  h+='<h5 style="color:green"> ... and an additional are also at hand</h5>'
-  h+='<div id="NotAssignedToYou"></div>'
-  bodyDiv.innerHTML+=h
+  4
   */
 
-}
+
 dashboard.show=function(that){
   var div = $('div',that.parentElement)[0]
   if(div.hidden){
