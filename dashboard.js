@@ -74,7 +74,10 @@ dashboard.UI=function(){
 }
 dashboard.getDashboardsForUser=function(email){
   email = email || dashboard.user
-  var dd = dashboard.dt[dashboard.user].dashboard // array of dashboards assigned to that user
+  if(!dashboard.dt[email]){
+    dashboard.dt[email]={dashboard:[]} // empty array if none found for this user
+  }
+  var dd = dashboard.dt[email].dashboard // array of dashboards assigned to that user
   var y = {}
   // this could be a good place to add other criteria, such as dashboards associated with 
   dd.forEach(function(d){
@@ -138,7 +141,7 @@ dashboard.onclickBookmark=function(that){
   bookmarkedDivs.appendChild(div)
   var fa = $('.fa',div)[0]
   fa.onclick=function(){dashboard.onclickUnBookmark(this)}
-  fa.style.color='pink'
+  fa.style.color='red'
   setTimeout(function(){
     fa.className="fa fa-bookmark"
   },200)
@@ -208,7 +211,7 @@ dashboard.show=function(that){
   if(div.hidden){
     div.hidden=false
     that.textContent="hide"
-    that.style.color="red"
+    that.style.color="blue"
   }else{
     div.hidden=true
     that.textContent="show"
