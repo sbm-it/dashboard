@@ -65,9 +65,9 @@ dashboard.loadDt=function(cb,url){
 
 // assemble UID
 dashboard.UI=function(){
-  h='<h5 id="TableauDashboardHeader" style="color:maroon">SBM Dashboard for <span style="color:navy">'+dashboard.user+'</span> <a href="https://github.com/sbm-it/dashboard" target="_blank"><i id="gitIcon" class="fa fa-github-alt" aria-hidden="true" style="color:maroon"></i></a></h5>'
+  h='<div id="TableauDashboardHeaderDiv" style="background-color:LightYellow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i id="TableauDashboardHeaderDate" style="color:navy;font-size:x-small">'+Date()+'<i><h5 id="TableauDashboardHeader" style="color:maroon">&nbsp;&nbsp;<img src="https://www.stonybrookmedicine.edu/sites/default/files/box-webfiles/img/stony-brook-medicine-logo-horizontal-300.png" height="40px"><br>&nbsp;&nbsp;Dashboard for <span style="color:navy">'+dashboard.user+'</span> <a href="https://github.com/sbm-it/dashboard" target="_blank"><i id="gitIcon" class="fa fa-github-alt" aria-hidden="true" style="color:maroon"></i></a></h5>&nbsp;</div>'
   localStorage.removeItem('tableauDashboard') // TO FORCE LOGIN EVERYTIME
-  h+="<hr>"
+  //h+="<hr>"
   h+='<div id="bodyDiv">...</div>'
   appSpace.innerHTML=h
   dashboard.bodyDiv()
