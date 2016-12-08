@@ -101,8 +101,9 @@ dashboard.bodyDiv=function(){
   })
   //var urls = dashboard.dt[dashboard.user].url
   var n = Object.getOwnPropertyNames(dd).length
-  h='<div id="keywordSelect">Keywords </div>'
-  h+='<hr>'
+  h='<div id="keywordSelect" style="background-color:LightGreen">Keywords </div>'
+  h+='<div id="keywordInfo" style="font-size:x-small;color:blue"></div>'
+  //h+='<hr>'
   h+='<h4 style="color:maroon"><i class="fa fa-arrow-right" aria-hidden="true"></i> Dashboards selected for preloading ( <i class="fa fa-bookmark-o" aria-hidden="true"></i> ):</h4>'
   h+='<div id="bookmarkedDivs"></div>'
   h+='<hr>'
@@ -114,7 +115,8 @@ dashboard.bodyDiv=function(){
   Object.getOwnPropertyNames(dd).forEach(function(di,i){
     var d = dd[di]
     var k = d.keywords || [''] // d.keywords
-    d.keywords = k.join(' ').split(/[\s]+/g)
+    //d.keywords = k.join(' ').split(/[\s]+/g)
+    d.keywords = k.join(' ').split(/,[\s]+/g)
     d.keywords.forEach(function(ki){
       dashboard.keywords[ki] = dashboard.keywords[ki] || []
       dashboard.keywords[ki].push(di)
@@ -126,8 +128,27 @@ dashboard.bodyDiv=function(){
 }
 
 dashboard.buildKeywordSelect=function(){
-  dashboard.keywords
+  keywordSelect.innerHTML='&nbsp;'
+  Object.getOwnPropertyNames(dashboard.keywords).forEach(function(k,i){
+    var sp = document.createElement('span')
+    sp.innerHTML='<input type="radio" id="keywordRadio_'+i+'" checked=true onclick="dashboard.radioKeywordClick(this)"><span onclick="dashboard.keywordClick(this)" onmouseover="dashboard.keywordOver(this)" style="color:navy">'+k+'</span>(<a href="#" data-toggle="tooltip" title="'+dashboard.keywords[k].join('\n')+'">'+dashboard.keywords[k].length+'</a>) '
+    sp.check=true // keep track of check selection here
+    keywordSelect.appendChild(sp)
+    4
+  })
   4
+}
+
+dashboard.keywordClick=function(that){
+  that.parentElement.children[0].click()
+}
+dashboard.keywordOver=function(that){
+  that.style.cursor='pointer'
+}
+
+dashboard.radioKeywordClick=function(that){
+  that.parentElement.check=!that.parentElement.check
+  that.checked=that.parentElement.check
 }
 
 dashboard.onclickBookmark=function(that){
@@ -165,7 +186,6 @@ dashboard.onclickUnBookmark=function(that){
 
 dashboard.onmouseoverBookmark=function(that){
   that.style.cursor="pointer"
-  4
 }
 
 dashboard.buildDivs=function(){ // create dashboard Divs and spread them between bookmarkedDivs and otherDivs
