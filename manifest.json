@@ -3,19 +3,19 @@
   "name": "StonyBrook Medicine Dashboard",
   "short_name": "Dashboard",
   "icons": [{
-        "src": "dash48.png",
-        "sizes": "48x22048"
+        "src": "https://sbu-bmi.github.io/dashboard/dash48.png",
+        "sizes": "48x48"
       },
       {
-        "src": "dash96.png",
+        "src": "https://sbu-bmi.github.io/dashboard/dash96.png",
         "sizes": "96x92"
       },
       {
-        "src": "dash128.png",
+        "src": "https://sbu-bmi.github.io/dashboard/dash128.png",
         "sizes": "128x128"
       }],
   "splash_screens": [{
-    "src": "dash220.png",
+    "src": "https://sbu-bmi.github.io/dashboard/dash220.png",
     "sizes": "220x220"
       }],
   "start_url": "https://sbu-bmi.github.io/dashboard/index.html",
