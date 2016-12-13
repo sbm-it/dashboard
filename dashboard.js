@@ -136,7 +136,14 @@ dashboard.buildKeywordSelect=function(){
     keywordSelect.appendChild(sp)
     4
   })
-  4
+  // div with list of dashboards triggered by each keyword
+  var div = document.createElement('div')
+  div.id = "keywordDasboardDiv"
+  div.style.backgroundColor="white"
+  div.style.color="green"
+  div.style.fontStyle="italic"
+  keywordSelect.appendChild(div)
+  div.innerHTML='(mouse over keyword above will list dashboards)'
 }
 
 dashboard.keywordClick=function(that){
@@ -144,6 +151,11 @@ dashboard.keywordClick=function(that){
 }
 dashboard.keywordOver=function(that){
   that.style.cursor='pointer'
+  var div = document.getElementById("keywordDasboardDiv")
+  var key = that.textContent
+  4
+
+
 }
 
 dashboard.radioKeywordClick=function(that){

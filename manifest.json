@@ -1,0 +1,15 @@
+{
+  "lang": "en",
+  "name": "StonyBrook Medicine Dashboard",
+  "short_name": "Dashboard",
+  "icons": [{
+        "src": "dash220.png",
+        "sizes": "220x220"
+      }],
+  "splash_screens": [{
+    "src": "dash220.png",
+    "sizes": "220x220"
+      }],
+  "start_url": "https://sbu-bmi.github.io/dashboard/index.html",
+  "display": "fullscreen"
+}
