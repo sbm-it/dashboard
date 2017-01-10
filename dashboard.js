@@ -210,14 +210,14 @@ dashboard.buildDivs=function(){ // create dashboard Divs and spread them between
       h += '<span style="color:navy">'+d.description.slice(-1)[0]+'</span> '
       bookmarkedDivs.appendChild(d.div)
     }else{
+      d.title=d.title||[' no title defined ']
       var h = '<h4><i style="color:blue" class="fa fa-bookmark-o" aria-hidden="true" onclick="dashboard.onclickBookmark(this)" onmouseover="dashboard.onmouseoverBookmark(this)"></i> <a href="'+d.url.slice(-1)[0]+'" target="_blank">'+d.title.slice(-1)[0]+'</a> <span style="color:green;font-size:x-small">['+di+']<span></h4>'
       h += '<span style="color:navy">'+d.description.slice(-1)[0]+'</span> '
       otherDivs.appendChild(d.div)
     }
     d.div.innerHTML=h
     d.div.dt=d
-
-    4
+    
   })
   4
 }
