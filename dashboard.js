@@ -16,6 +16,12 @@ dashboard=function(){ // ini
     location.search.slice(1).split('&').forEach(function(pp){pp=pp.split('=');parms[pp[0]]=pp[1]})   
     location.hash.slice(1).split('&').forEach(function(pp){pp=pp.split('=');parms[pp[0]]=pp[1]})   
     console.log(parms)
+    if(parms.docminer){ // getting a call for a report from crystal.html
+      localStorage.dashboardDocminer=JSON.stringify({
+        report:parms.docminer,
+        calledAt:Date()
+      })
+    }
     if((!parms.code)&&(!parms.id_token)){
       location.href='https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&redirect_uri='+location.origin+location.pathname+'&client_id=04c089f8-213f-4783-9b5f-cfa7b227d50b'
     }
@@ -66,11 +72,20 @@ dashboard.loadDt=function(cb,url){
 // assemble UID
 dashboard.UI=function(){
   h='<div id="TableauDashboardHeaderDiv" style="background-color:LightYellow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i id="TableauDashboardHeaderDate" style="color:navy;font-size:x-small">'+Date()+'<i><h5 id="TableauDashboardHeader" style="color:maroon">&nbsp;&nbsp;<img src="https://www.stonybrookmedicine.edu/sites/default/files/box-webfiles/img/stony-brook-medicine-logo-horizontal-300.png" height="40px"><br>&nbsp;&nbsp;Dashboard for <span style="color:navy">'+dashboard.user+'</span> <a href="https://github.com/sbm-it/dashboard" target="_blank"><i id="gitIcon" class="fa fa-github-alt" aria-hidden="true" style="color:maroon"></i></a></h5>&nbsp;</div>'
+  // checking if a docminer report is being requested
+  var dm=null
+  if(localStorage.dashboardDocminer){
+    dm = JSON.parse(localStorage.dashboardDocminer) // read it 
+    localStorage.removeItem('dashboardDocminer') // remove it
+    if(((new Date)-(new Date(dm.calledAt)))<10000){
+      h += '<div id="docminerReport">...</div>'
+    }
+  }
   localStorage.removeItem('tableauDashboard') // TO FORCE LOGIN EVERYTIME
   //h+="<hr>"
   h+='<div id="bodyDiv">...</div>'
   appSpace.innerHTML=h
-  dashboard.bodyDiv()
+  dashboard.bodyDiv(dm)
 }
 dashboard.getDashboardsForUser=function(email){
   email = email || dashboard.user
@@ -90,7 +105,7 @@ dashboard.getDashboardsForUser=function(email){
   })
   return y
 }
-dashboard.bodyDiv=function(){
+dashboard.bodyDiv=function(dm){
   if(!localStorage.dashboardBookmarks){localStorage.setItem('dashboardBookmarks','[]')}
   dashboard.bookmarks=JSON.parse(localStorage.dashboardBookmarks)
   var dd = dashboard.getDashboardsForUser() // object with dashboards assigned to this user
@@ -125,6 +140,19 @@ dashboard.bodyDiv=function(){
   dashboard.dbs=dd
   dashboard.buildDivs()
   dashboard.buildKeywordSelect()
+
+  // getting docminerReport if that is the case
+  if(dm){
+    let div = document.querySelector('#docminerReport')
+    let h = '<hr>'
+    h += '<h2 style="color:maroon">DocMiner Report "'+dm.report+'"</h2>'
+    h += '<p style="color:blue">Unfortunately this report was <b style="color:red;background-color:yellow;font-size:x-large">not described with a dereferenceable URI</b>.</p>'
+    h += '<p style="color:green">Below you can find a few examples of such reports, safely dereferencable as Healthe Intent dashboards.'
+    h += ' They were ceated by some of your colleagues using Tableau, and could be provided for other platforms such as Crystal, Plotly, etc'
+    h += '</p>'
+    h += '<hr>'
+    div.innerHTML=h
+  }
 }
 
 dashboard.buildKeywordSelect=function(){
