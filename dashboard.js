@@ -77,7 +77,7 @@ dashboard.UI=function(){
   if(localStorage.dashboardDocminer){
     dm = JSON.parse(localStorage.dashboardDocminer) // read it 
     localStorage.removeItem('dashboardDocminer') // remove it
-    if(((new Date)-(new Date(dm.calledAt)))<10000){
+    if(((new Date)-(new Date(dm.calledAt)))<60000){
       h += '<div id="docminerReport">...</div>'
     }
   }
@@ -146,7 +146,7 @@ dashboard.bodyDiv=function(dm){
     let div = document.querySelector('#docminerReport')
     let h = '<hr>'
     h += '<h2 style="color:maroon">DocMiner Report "<span style="background-color:yellow;color:blue">'+decodeURI(dm.report)+'</span>"</h2>'
-    h += '<p style="color:blue">Unfortunately this report was <b style="color:red;background-color:yellow;font-size:x-large">not described with a dereferenceable URI</b>.</p>'
+    h += '<p style="color:blue">Unfortunately this report was <b style="color:red;background-color:yellow;font-size:large">not described with a dereferenceable URL</b>.</p>'
     h += '<p style="color:green">Below you can find a few examples of such reports, safely dereferencable as Healthe Intent dashboards.'
     h += ' They were ceated by some of your colleagues using Tableau, and could be provided for other platforms such as Crystal, Plotly, etc'
     h += '</p>'
